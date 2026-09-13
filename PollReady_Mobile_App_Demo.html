@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PollReady — Mobile App Walkthrough</title>
+<style>
+:root{
+  --ink:#10241D;--ink2:#183328;--green:#1B6B4A;--green-l:#2E8A62;--green-p:#EAF2ED;
+  --brass:#B8863B;--brass-p:#F6F0E2;--brick:#A8432C;--brick-p:#F8ECE8;--blue:#2F5D82;--blue-p:#EAF0F6;
+  --tx:#17201C;--tx2:#5C6560;--tx3:#8A928C;--line:#E2E5E0;--line2:#EFF1ED;--bg:#F4F6F3;
+  --serif:Georgia,"Times New Roman",serif;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:var(--sans);background:#16241E;color:#fff;min-height:100vh;
+  background-image:radial-gradient(circle at 22% 12%,#1E3A2E 0%,#16241E 55%);
+  -webkit-font-smoothing:antialiased;
+}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;font-size:inherit}
+:focus-visible{outline:2px solid var(--green-l);outline-offset:2px}
+.num{font-variant-numeric:tabular-nums}
+
+.stage{max-width:1280px;margin:0 auto;padding:26px 24px 44px;display:flex;gap:40px;align-items:flex-start}
+@media(max-width:1000px){.stage{flex-direction:column;align-items:center;gap:26px}}
+
+/* ---- left rail ---- */
+.rail{width:330px;flex:0 0 330px;position:sticky;top:26px}
+@media(max-width:1000px){.rail{position:static;width:100%;flex:none;max-width:420px}}
+.logo{display:flex;gap:11px;align-items:center;margin-bottom:22px}
+.logo .m{width:38px;height:38px;border-radius:7px;background:var(--green);display:flex;align-items:center;justify-content:center}
+.logo .n{font-family:var(--serif);font-size:21px;letter-spacing:.2px}
+.logo .s{font-size:11px;color:#8FA79A;margin-top:1px}
+.rail h2{font-family:var(--serif);font-size:25px;font-weight:400;line-height:1.25;margin-bottom:9px}
+.rail p.lede{font-size:13.5px;color:#A9BFB4;line-height:1.6;margin-bottom:22px}
+
+.rolesw{display:flex;background:rgba(255,255,255,.07);border-radius:8px;padding:4px;margin-bottom:20px}
+.rolesw button{flex:1;padding:8px 6px;border-radius:6px;font-size:12.5px;font-weight:600;color:#A9BFB4}
+.rolesw button.on{background:#fff;color:var(--ink)}
+
+.steps{display:flex;flex-direction:column;gap:2px}
+.step{display:flex;gap:12px;align-items:flex-start;padding:9px 11px;border-radius:7px;text-align:left;width:100%}
+.step:hover{background:rgba(255,255,255,.06)}
+.step.on{background:rgba(46,138,98,.25)}
+.step .n{width:22px;height:22px;flex:0 0 22px;border-radius:50%;border:1.5px solid rgba(255,255,255,.3);
+  display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:700;color:#A9BFB4;margin-top:1px}
+.step.on .n,.step.done .n{background:var(--green-l);border-color:var(--green-l);color:#fff}
+.step .t{font-size:13px;font-weight:600;line-height:1.3}
+.step .d{font-size:11.5px;color:#8FA79A;margin-top:2px;line-height:1.4}
+.step.on .d{color:#C3D6CC}
+
+.note{margin-top:22px;padding:13px 14px;border:1px solid rgba(255,255,255,.13);border-radius:8px;background:rgba(255,255,255,.04)}
+.note b{font-size:12px;display:block;margin-bottom:4px}
+.note p{font-size:11.5px;color:#A9BFB4;line-height:1.55}
+
+/* ---- phone ---- */
+.phonewrap{flex:1;display:flex;flex-direction:column;align-items:center}
+.phone{
+  width:378px;height:790px;background:#0B1512;border-radius:44px;padding:11px;
+  box-shadow:0 28px 70px rgba(0,0,0,.55),0 0 0 1.5px rgba(255,255,255,.09),inset 0 0 0 2px #253830;
+  position:relative;flex:0 0 auto;
+}
+.screen{width:100%;height:100%;background:var(--bg);border-radius:34px;overflow:hidden;position:relative;
+  display:flex;flex-direction:column;color:var(--tx)}
+.notch{position:absolute;top:11px;left:50%;margin-left:-59px;width:118px;height:27px;background:#0B1512;border-radius:0 0 16px 16px;z-index:30}
+.sbar{height:40px;flex:0 0 40px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 21px 5px;
+  font-size:11.5px;font-weight:600;background:transparent;position:relative;z-index:20}
+.sbar .ic{display:flex;gap:4px;align-items:center}
+.sbar svg{width:14px;height:11px}
+
+.appbar{background:#fff;border-bottom:1px solid var(--line);padding:9px 16px 11px;flex:0 0 auto}
+.appbar.dk{background:var(--ink);border-bottom:none;color:#fff}
+.abrow{display:flex;align-items:center;gap:10px}
+.abrow .ttl{font-size:16px;font-weight:700;letter-spacing:-.2px}
+.abrow .sub{font-size:11.5px;color:var(--tx2);margin-top:1px}
+.appbar.dk .sub{color:#9FB3A9}
+.abrow .rt{margin-left:auto;display:flex;gap:9px;align-items:center}
+.iconb{width:29px;height:29px;border-radius:7px;background:var(--bg);display:flex;align-items:center;justify-content:center;color:var(--tx2)}
+.appbar.dk .iconb{background:rgba(255,255,255,.1);color:#CBD6CF}
+
+.body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.body::-webkit-scrollbar{width:0}
+.pad{padding:14px 16px}
+
+.tabbar{flex:0 0 auto;background:#fff;border-top:1px solid var(--line);display:flex;padding:7px 4px 13px}
+.tb{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--tx3);font-size:9.5px;font-weight:600;padding:3px 0}
+.tb svg{width:20px;height:20px}
+.tb.on{color:var(--green)}
+
+/* generic ui */
+.card{background:#fff;border:1px solid var(--line);border-radius:11px;overflow:hidden;margin-bottom:12px}
+.card.pad2{padding:14px}
+.ch{padding:12px 14px;border-bottom:1px solid var(--line2);display:flex;align-items:center}
+.ch h4{font-size:13px;font-weight:700}
+.ch .r{margin-left:auto;font-size:11px;color:var(--tx3)}
+.sect{font-size:11.5px;font-weight:700;color:var(--tx2);margin:16px 0 8px}
+.mini{font-size:11.5px;color:var(--tx2);line-height:1.5}
+
+.hero{background:var(--ink);color:#fff;padding:16px;border-radius:0 0 20px 20px;margin:-1px -16px 14px;position:relative;overflow:hidden}
+.hero .wk{font-size:11.5px;color:#9FB3A9}
+.hero h3{font-family:var(--serif);font-size:20px;font-weight:400;margin:4px 0 3px;line-height:1.25}
+.hero .mt{font-size:11.5px;color:#9FB3A9;margin-bottom:13px}
+.hbar{height:6px;background:rgba(255,255,255,.18);border-radius:4px;overflow:hidden;margin-bottom:7px}
+.hbar i{display:block;height:100%;background:var(--green-l);border-radius:4px}
+.hstat{display:flex;font-size:11px;color:#9FB3A9}
+.hstat b{color:#fff}
+
+.btnP{width:100%;background:var(--green);color:#fff;border-radius:9px;padding:12px;font-size:13.5px;font-weight:700;text-align:center}
+.btnP:active{background:#165A3F}
+.btnS{width:100%;background:#fff;color:var(--tx);border:1px solid var(--line);border-radius:9px;padding:11px;font-size:13px;font-weight:600;text-align:center}
+.btnG{background:var(--green-p);color:var(--green);border-radius:8px;padding:9px 12px;font-size:12.5px;font-weight:700}
+
+.pill{display:inline-flex;align-items:center;font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:4px}
+.pg{background:var(--green-p);color:#17624A}
+.pb{background:var(--blue-p);color:#2A5476}
+.pbr{background:var(--brass-p);color:#7A6222}
+.pr{background:var(--brick-p);color:#8F3A26}
+.pn{background:#F0F1EE;color:#66665E}
+
+.wkrow{display:flex;align-items:center;padding:11px 14px;border-bottom:1px solid var(--line2)}
+.wkrow:last-child{border-bottom:none}
+.wkno{width:27px;height:27px;flex:0 0 27px;border-radius:8px;background:var(--bg);border:1px solid var(--line);
+  display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--tx2);margin-right:11px}
+.wkno.done{background:var(--green);border-color:var(--green);color:#fff}
+.wkno.now{background:var(--brass);border-color:var(--brass);color:#fff}
+.wkrow .tt{font-size:12.5px;font-weight:600;line-height:1.3}
+.wkrow .ss{font-size:10.5px;color:var(--tx3);margin-top:1px}
+.wkrow .rr{margin-left:auto;padding-left:8px}
+
+.lvl{display:flex;align-items:center;padding:9px 0;border-bottom:1px solid var(--line2)}
+.lvl:last-child{border-bottom:none}
+.lvl .d{width:19px;height:19px;flex:0 0 19px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:9.5px;font-weight:700;margin-right:10px}
+.lvl .nm{font-size:12.5px;font-weight:600}
+.lvl .st{margin-left:auto;font-size:11px;font-weight:600}
+
+.blk{background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px 13px;margin-bottom:9px;display:flex;align-items:flex-start}
+.blk .mn{width:30px;flex:0 0 30px;font-size:10.5px;font-weight:700;color:var(--tx3);padding-top:1px}
+.blk .t{font-size:12.5px;font-weight:600}
+.blk .s{font-size:11px;color:var(--tx2);margin-top:2px;line-height:1.45}
+.blk.act{border-color:var(--green);background:#F7FBF9}
+
+.msg{margin-bottom:11px;display:flex}
+.msg.me{justify-content:flex-end}
+.bub{max-width:82%;padding:10px 12px;border-radius:13px;font-size:12.5px;line-height:1.5}
+.bub.ai{background:#fff;border:1px solid var(--line);border-top-left-radius:4px}
+.bub.me{background:var(--ink);color:#fff;border-top-right-radius:4px}
+.who{font-size:10px;color:var(--tx3);margin-bottom:4px;font-weight:600}
+.typing{display:flex;gap:4px;padding:12px}
+.typing i{width:6px;height:6px;border-radius:50%;background:var(--tx3);display:block;animation:bl 1.2s infinite}
+.typing i:nth-child(2){animation-delay:.18s}.typing i:nth-child(3){animation-delay:.36s}
+@keyframes bl{0%,60%,100%{opacity:.25}30%{opacity:1}}
+
+.scorebox{background:#fff;border:1px solid var(--line);border-radius:11px;padding:13px;margin-bottom:11px}
+.scorerow{display:flex;align-items:center;padding:6px 0;border-bottom:1px solid var(--line2);font-size:12px}
+.scorerow:last-child{border-bottom:none}
+.scorerow .k{color:var(--tx2)}
+.scorerow .v{margin-left:auto;font-weight:700}
+.bar{height:6px;background:var(--line2);border-radius:4px;overflow:hidden;flex:1;margin:0 10px}
+.bar i{display:block;height:100%;background:var(--green);border-radius:4px}
+.bar.w i{background:var(--brass)}.bar.d i{background:var(--brick)}
+
+.inp{width:100%;border:1px solid var(--line);border-radius:9px;padding:11px 12px;font-family:inherit;font-size:12.5px;
+  background:#fff;color:var(--tx);resize:none}
+.inp:focus{outline:none;border-color:var(--green)}
+.sel{width:100%;border:1px solid var(--line);border-radius:9px;padding:11px 12px;font-family:inherit;font-size:12.5px;background:#fff;color:var(--tx)}
+.sel:disabled{background:#F5F6F4;color:var(--tx3)}
+.lab{font-size:11.5px;font-weight:600;color:var(--tx2);margin-bottom:5px;display:block}
+.fg{margin-bottom:13px}
+.cascade{display:flex;align-items:center;margin-bottom:5px}
+.cascade .ln{width:12px;height:1px;background:var(--line);margin-right:7px;flex:0 0 12px}
+
+.qopt{display:flex;align-items:center;border:1px solid var(--line);border-radius:9px;padding:11px 12px;margin-bottom:8px;background:#fff;width:100%;text-align:left}
+.qopt .k{width:21px;height:21px;flex:0 0 21px;border-radius:50%;border:1.5px solid var(--line);display:flex;align-items:center;
+  justify-content:center;font-size:10.5px;font-weight:700;color:var(--tx3);margin-right:10px}
+.qopt.sel2{border-color:var(--green);background:#F5FAF7}
+.qopt.sel2 .k{background:var(--green);border-color:var(--green);color:#fff}
+.qopt.wrong{border-color:var(--brick);background:#FCF4F2}
+.qopt.wrong .k{background:var(--brick);border-color:var(--brick);color:#fff}
+.qopt .tx{font-size:12.5px;line-height:1.4}
+
+.cert{background:linear-gradient(160deg,#14372A,#1B6B4A);color:#fff;border-radius:13px;padding:18px 16px;text-align:center;margin-bottom:12px}
+.cert .sealw{width:54px;height:54px;margin:0 auto 11px;border-radius:50%;border:2px solid rgba(255,255,255,.45);
+  display:flex;align-items:center;justify-content:center}
+.cert h3{font-family:var(--serif);font-size:17px;font-weight:400;margin-bottom:3px}
+.cert .nm{font-family:var(--serif);font-size:21px;margin:9px 0 4px}
+.cert .mt{font-size:11px;color:#B5D0C2;line-height:1.6}
+.cert .ref{margin-top:12px;padding-top:11px;border-top:1px solid rgba(255,255,255,.22);font-size:10.5px;color:#B5D0C2}
+
+.trow{display:flex;align-items:center;padding:11px 14px;border-bottom:1px solid var(--line2)}
+.trow:last-child{border-bottom:none}
+.avx{width:32px;height:32px;flex:0 0 32px;border-radius:50%;color:#fff;display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;margin-right:11px}
+.trow .n{font-size:12.5px;font-weight:600}
+.trow .m{font-size:10.5px;color:var(--tx3);margin-top:1px}
+.trow .r{margin-left:auto;text-align:right}
+
+.caption{margin-top:16px;max-width:378px;text-align:center;font-size:12px;color:#9FB3A9;line-height:1.6}
+.dots{display:flex;gap:6px;justify-content:center;margin-top:14px}
+.dots i{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.22);display:block}
+.dots i.on{background:var(--green-l);width:18px;border-radius:3px}
+.navbtns{display:flex;gap:10px;margin-top:16px}
+.navbtns button{background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.15);border-radius:8px;
+  padding:9px 18px;font-size:12.5px;font-weight:600;color:#fff}
+.navbtns button:hover{background:rgba(255,255,255,.16)}
+.navbtns button[disabled]{opacity:.35;cursor:default}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="rail">
+    <div class="logo">
+      <div class="m"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></div>
+      <div><div class="n">PollReady</div><div class="s">Mobile app walkthrough</div></div>
+    </div>
+    <h2 id="railH">Training that proves readiness</h2>
+    <p class="lede" id="railP">Sixteen weeks, delivered one session at a time — with every answer scored, every mistake corrected, and every participant tracked to certification.</p>
+
+    <div class="rolesw">
+      <button id="rbP" class="on" onclick="setRole('p')">Participant</button>
+      <button id="rbT" onclick="setRole('t')">Trainer</button>
+    </div>
+
+    <div class="steps" id="steps"></div>
+
+    <div class="note">
+      <b>Demonstration build</b>
+      <p>All figures, names and polling unit assignments are sample data. The scored responses shown here illustrate how the assessment layer behaves in the finished product.</p>
+    </div>
+  </div>
+
+  <div class="phonewrap">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="screen">
+        <div class="sbar">
+          <span class="num" id="clock">09:41</span>
+          <span class="ic">
+            <svg viewBox="0 0 24 16" fill="currentColor"><rect x="0" y="10" width="3" height="6" rx="1"/><rect x="5" y="7" width="3" height="9" rx="1"/><rect x="10" y="4" width="3" height="12" rx="1"/><rect x="15" y="1" width="3" height="15" rx="1"/></svg>
+            <svg viewBox="0 0 26 14" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="1" y="1" width="20" height="12" rx="3"/><rect x="3" y="3" width="14" height="8" rx="1.5" fill="currentColor" stroke="none"/><path d="M23 5v4" stroke-width="2.2" stroke-linecap="round"/></svg>
+          </span>
+        </div>
+        <div id="app"></div>
+      </div>
+    </div>
+    <div class="dots" id="dots"></div>
+    <div class="navbtns">
+      <button id="prevB" onclick="move(-1)">Back</button>
+      <button id="nextB" onclick="move(1)">Next screen</button>
+    </div>
+    <p class="caption" id="cap"></p>
+  </div>
+</div>
+
+<script>
+/* =============== SCREEN CONTENT =============== */
+function tab(active){
+  const items=[["Home",'<path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><path d="M9 22V12h6v10"/>'],
+    ["Programme",'<path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>'],
+    ["Practice",'<path d="M12 2l2.4 7.4H22l-6 4.4 2.3 7.2-6.3-4.6L5.7 21 8 13.8 2 9.4h7.6z"/>'],
+    ["Progress",'<path d="M18 20V10M12 20V4M6 20v-6"/>'],
+    ["Profile",'<path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>']];
+  return `<div class="tabbar">${items.map(([l,ic],i)=>`<div class="tb ${active===i?'on':''}">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${ic}</svg>
+    <span>${l}</span></div>`).join("")}</div>`;
+}
+const WEEKS=["Understanding the election process","Polling unit agents","Security personnel","The results journey",
+"What BVAS is","BVAS before use","BVAS troubleshooting","BVAS care and security","A complete polling day",
+"Counting and documentation","Ward collation","Local government collation","BVAS practical","Mock election",
+"Pressure and disputes","Final assessment"];
+
+const P=[];
+
+/* 1 — sign up, geographic cascade */
+P.push({t:"Create account",c:"Registration captures where each participant will actually serve — state, local government, ward, then polling unit. Each list only loads what sits under the level above it.",
+h:()=>`
+<div class="appbar"><div class="abrow"><div><div class="ttl">Where will you serve?</div>
+<div class="sub">Step 2 of 3 · Deployment assignment</div></div></div></div>
+<div class="body"><div class="pad">
+  <p class="mini" style="margin-bottom:15px">Your training content and your trainer are assigned from this. You can only pick a polling unit that exists in the ward you choose.</p>
+  <div class="fg"><span class="lab">State</span><select class="sel"><option>Kano</option></select></div>
+  <div class="fg"><div class="cascade"><span class="ln"></span><span class="lab" style="margin:0">Local government area</span></div>
+    <select class="sel"><option>Dala</option></select>
+    <p class="mini" style="margin-top:5px;color:var(--tx3)">6 of 774 nationwide shown for Kano</p></div>
+  <div class="fg"><div class="cascade"><span class="ln" style="margin-left:12px"></span><span class="ln"></span><span class="lab" style="margin:0">Ward / registration area</span></div>
+    <select class="sel"><option>Gwammaja</option></select></div>
+  <div class="fg"><div class="cascade"><span class="ln" style="margin-left:24px"></span><span class="ln"></span><span class="ln"></span><span class="lab" style="margin:0">Polling unit</span></div>
+    <select class="sel"><option>PU 001 — Gwammaja Primary School</option></select>
+    <p class="mini" style="margin-top:5px;color:var(--tx3)">Searchable — 176,846 units in the national register</p></div>
+  <div class="fg"><span class="lab">Your role on election day</span><select class="sel"><option>Party / polling unit agent</option></select></div>
+  <button class="btnP">Continue</button>
+</div></div>`});
+
+/* 2 — home */
+P.push({t:"Home",c:"The participant opens to one thing: what is due this week. Progress through the sixteen weeks and the current competency level sit above everything else.",
+h:()=>`
+<div class="body"><div class="pad" style="padding-top:0">
+  <div class="hero">
+    <div class="wk">Week 11 of 16 · Month Three</div>
+    <h3>Ward and registration<br>area collation</h3>
+    <div class="mt">Opens today · 45 minutes · Ngozi Abaniwo</div>
+    <div class="hbar"><i style="width:63%"></i></div>
+    <div class="hstat"><span><b>10</b>&nbsp;weeks complete</span><span style="margin-left:auto"><b>Level 3</b>&nbsp;of 5</span></div>
+  </div>
+  <div class="card">
+    <div class="ch"><h4>Due this week</h4><span class="r">3 items</span></div>
+    <div class="wkrow"><div class="wkno now">11</div><div><div class="tt">Week 11 lesson</div><div class="ss">15 minutes · not started</div></div><div class="rr"><span class="pill pbr">Due</span></div></div>
+    <div class="wkrow"><div class="wkno" style="background:var(--blue-p);border-color:#CEDDE9;color:var(--blue)">D</div><div><div class="tt">Scenario drill</div><div class="ss">Result discrepancy at collation</div></div><div class="rr"><span class="pill pbr">Due</span></div></div>
+    <div class="wkrow"><div class="wkno" style="background:var(--bg)">T</div><div><div class="tt">Take-home task</div><div class="ss">From Week 10 · submit before Friday</div></div><div class="rr"><span class="pill pr">Overdue</span></div></div>
+  </div>
+  <div class="card">
+    <div class="ch"><h4>Live session</h4></div>
+    <div style="padding:13px 14px">
+      <div style="display:flex;align-items:center;margin-bottom:10px">
+        <div style="width:36px;height:36px;border-radius:9px;background:var(--green-p);display:flex;align-items:center;justify-content:center;margin-right:11px">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#1B6B4A" stroke-width="2"><rect x="2" y="5" width="14" height="14" rx="2"/><path d="M22 8l-6 4 6 4z"/></svg></div>
+        <div><div style="font-size:12.5px;font-weight:700">Today, 10:00 — 10:45</div>
+        <div style="font-size:11px;color:var(--tx2);margin-top:1px">Ngozi Abaniwo · cohort KAN-C1</div></div>
+      </div>
+      <button class="btnP" style="padding:10px">Join on Google Meet</button>
+    </div>
+  </div>
+  <div class="card pad2" style="display:flex;align-items:center">
+    <div><div style="font-size:12.5px;font-weight:700">Escalation pathways</div>
+    <div class="mini" style="margin-top:2px">Flagged from your Week 7 drill. Two practice questions ready.</div></div>
+    <button class="btnG" style="margin-left:11px;flex:0 0 auto">Practise</button>
+  </div>
+</div></div>${tab(0)}`});
+
+/* 3 — session structure */
+P.push({t:"Weekly session",c:"Every session follows the same five blocks from the training model. The shape never changes, so participants always know what is coming.",
+h:()=>`
+<div class="appbar"><div class="abrow"><div class="iconb"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 18l-6-6 6-6"/></svg></div>
+<div><div class="ttl">Week 11</div><div class="sub">Ward and registration area collation</div></div></div></div>
+<div class="body"><div class="pad">
+  <div class="blk"><div class="mn">5 min</div><div><div class="t">Check-in and recap</div><div class="s">Week 10 — counting and result documentation. Two questions outstanding.</div></div></div>
+  <div class="blk act"><div class="mn">15 min</div><div><div class="t">Main lesson</div>
+    <div class="s">What document is this? Is the documentation complete? Does it correspond? Is there an issue to escalate?</div>
+    <button class="btnP" style="margin-top:10px;padding:9px">Start lesson</button></div></div>
+  <div class="blk"><div class="mn">15 min</div><div><div class="t">Practical application</div><div class="s">Scenario drill — a ward result figure that does not correspond with its accompanying form.</div></div></div>
+  <div class="blk"><div class="mn">5 min</div><div><div class="t">Questions</div><div class="s">Ask your trainer, or read what others in your cohort asked.</div></div></div>
+  <div class="blk"><div class="mn">5 min</div><div><div class="t">Take-home task</div><div class="s">One commitment to carry into Week 12.</div></div></div>
+  <div class="card pad2" style="background:#F7FBF9;border-color:#CFE4D8">
+    <div style="font-size:12px;font-weight:700;margin-bottom:4px">Your role this week</div>
+    <p class="mini">You are training as a party agent. At collation your job is to observe and record — never to correct a figure yourself.</p>
+  </div>
+</div></div>${tab(1)}`});
+
+/* 4 — quiz */
+P.push({t:"Knowledge quiz",c:"Questions are generated per participant from approved content, so no two people get an identical set. Wrong answers go straight into the correction stage.",
+h:()=>`
+<div class="appbar"><div class="abrow"><div><div class="ttl">Week 11 quiz</div><div class="sub">Question 4 of 8</div></div>
+<div class="rt"><span class="pill pn">02:14 left</span></div></div>
+<div style="height:4px;background:var(--line2);border-radius:3px;margin-top:10px"><i style="display:block;height:100%;width:50%;background:var(--green);border-radius:3px"></i></div></div>
+<div class="body"><div class="pad">
+  <p style="font-size:14px;line-height:1.5;font-weight:600;margin-bottom:14px">A result sheet arrives at ward collation without the presiding officer's signature. What is the correct action?</p>
+  <button class="qopt"><span class="k">A</span><span class="tx">Accept it and record the figures, then ask for the signature later</span></button>
+  <button class="qopt sel2"><span class="k">B</span><span class="tx">Flag the incomplete documentation before proceeding, and escalate through the proper channel</span></button>
+  <button class="qopt"><span class="k">C</span><span class="tx">Reject the sheet and send it back to the polling unit</span></button>
+  <button class="qopt"><span class="k">D</span><span class="tx">Sign it yourself to keep the collation moving</span></button>
+  <button class="btnP" style="margin-top:6px">Submit answer</button>
+  <p class="mini" style="text-align:center;margin-top:11px;color:var(--tx3)">Your score contributes to Level 3 — Understanding</p>
+</div></div>`});
+
+/* 5 — scenario drill */
+P.push({t:"Scenario drill",c:"The Practise stage. No multiple choice — the participant types what they would actually do, and must explain their reasoning.",
+h:()=>`
+<div class="appbar dk"><div class="abrow"><div><div class="ttl">Scenario drill</div><div class="sub">Week 11 · collation · answer in your own words</div></div></div></div>
+<div class="body" style="background:var(--bg)"><div class="pad">
+  <div class="msg"><div style="width:100%"><div class="who">Situation</div>
+    <div class="bub ai" style="max-width:100%">You are observing collation at the ward centre. A result sheet shows 612 accredited voters but 689 votes cast. The collation officer is about to record the figures.
+    <div style="margin-top:9px;padding-top:9px;border-top:1px solid var(--line2);font-weight:600">What do you do, and why?</div></div></div></div>
+  <div class="msg me"><div class="bub me">I will not touch the sheet or the figures. I would calmly draw the collation officer's attention to the difference and ask for clarification, then formally note it. If it is not resolved I escalate to the collation supervisor. It is not my place to correct or announce anything myself.</div></div>
+  <div class="msg"><div style="width:100%"><div class="who">Assessment</div>
+    <div class="bub ai" style="max-width:100%">
+      <div style="display:flex;align-items:center;margin-bottom:9px">
+        <span class="pill pg">Scored 88%</span>
+        <span style="margin-left:auto;font-size:11px;color:var(--tx3)">Held for trainer review</span></div>
+      <div class="scorerow"><span class="k">Correct action</span><div class="bar"><i style="width:100%"></i></div><span class="v">Yes</span></div>
+      <div class="scorerow"><span class="k">Reasoning sound</span><div class="bar"><i style="width:90%"></i></div><span class="v">Yes</span></div>
+      <div class="scorerow"><span class="k">Stayed within role</span><div class="bar"><i style="width:100%"></i></div><span class="v">Yes</span></div>
+      <div class="scorerow"><span class="k">Escalated correctly</span><div class="bar w"><i style="width:62%"></i></div><span class="v">Partly</span></div>
+      <div style="margin-top:10px;font-size:12px;line-height:1.5;color:var(--tx2)">Strong response. You correctly refused to handle the figures. You named the supervisor but not the formal record — the observation must be written into your agent's report at the time, not afterwards.</div>
+    </div></div></div>
+</div></div>`});
+
+/* 6 — correction debrief */
+P.push({t:"Correction debrief",c:"When an answer is wrong, the app does not just give the right one. It runs the three-step debrief from the training model: what did you do, why, and what should have happened.",
+h:()=>`
+<div class="appbar dk"><div class="abrow"><div><div class="ttl">Let's work through that</div><div class="sub">Correction · Week 7 drill</div></div></div></div>
+<div class="body" style="background:var(--bg)"><div class="pad">
+  <div class="msg"><div style="width:100%"><div class="who">Step 1 — what did you do?</div>
+  <div class="bub ai" style="max-width:100%">You said the BVAS authentication failure meant the voter was not genuine, and that you would report them. Is that a fair summary?</div></div></div>
+  <div class="msg me"><div class="bub me">Yes, that's what I said.</div></div>
+  <div class="msg"><div style="width:100%"><div class="who">Step 2 — why did you do it?</div>
+  <div class="bub ai" style="max-width:100%">What made you conclude the voter was not genuine?</div></div></div>
+  <div class="msg me"><div class="bub me">Because the fingerprint did not match, so I assumed the person was not the real owner of the card.</div></div>
+  <div class="msg"><div style="width:100%"><div class="who">Step 3 — what should have happened?</div>
+  <div class="bub ai" style="max-width:100%">That is the gap. A failed authentication is a procedural event, not a finding of fraud. Fingerprints fail for worn ridges, moisture, dirt on the sensor, or finger position.
+  <div style="margin-top:9px;padding:10px;background:var(--green-p);border-radius:8px;font-size:12px;line-height:1.5">
+  <b>The correct sequence:</b> retry with correct finger placement, check the sensor is clean, follow the prescribed alternative procedure, and escalate if it still fails. You never determine fraud — that is not within your role.</div>
+  <div style="margin-top:9px">Where does the decision on that voter's accreditation sit?</div></div></div></div>
+  <div class="typing"><i></i><i></i><i></i></div>
+</div></div>`});
+
+/* 7 — progress */
+P.push({t:"My progress",c:"The five competency levels, visible to the participant. It is explicit that certification only comes at Level 5, and that a trainer confirms it.",
+h:()=>`
+<div class="appbar"><div class="abrow"><div><div class="ttl">My progress</div><div class="sub">Fatima Abubakar · PR-0042 · KAN-C1</div></div></div></div>
+<div class="body"><div class="pad">
+  <div class="card pad2">
+    <div style="display:flex;margin-bottom:13px">
+      <div style="flex:1"><div class="mini">Assessment average</div><div style="font-family:var(--serif);font-size:28px;line-height:1.1">76%</div>
+      <div style="font-size:11px;color:var(--green);font-weight:700;margin-top:2px">+38 from baseline</div></div>
+      <div style="flex:1"><div class="mini">Attendance</div><div style="font-family:var(--serif);font-size:28px;line-height:1.1">92%</div>
+      <div style="font-size:11px;color:var(--tx3);margin-top:2px">10 of 11 sessions</div></div>
+      <div style="flex:1"><div class="mini">Drills done</div><div style="font-family:var(--serif);font-size:28px;line-height:1.1">24</div>
+      <div style="font-size:11px;color:var(--tx3);margin-top:2px">18 passed first try</div></div>
+    </div>
+    <div class="bar" style="margin:0"><i style="width:69%"></i></div>
+    <p class="mini" style="margin-top:7px">Week 11 of 16 · five weeks to final assessment</p>
+  </div>
+  <div class="card">
+    <div class="ch"><h4>Competency level</h4><span class="r">3 of 5</span></div>
+    <div style="padding:4px 14px 12px">
+      ${[["Attendance","You were present",1],["Participation","You engaged with the material",1],["Understanding","You can explain the subject",1],["Competence","You can apply it under pressure",0],["Readiness","You can perform in a realistic situation",0]].map((l,i)=>`
+      <div class="lvl"><div class="d" style="background:${l[2]?'var(--green)':'#EFF1ED'};color:${l[2]?'#fff':'var(--tx3)'}">${l[2]?'✓':i+1}</div>
+      <div><div class="nm">${l[0]}</div><div class="mini" style="font-size:11px">${l[1]}</div></div>
+      <div class="st" style="color:${l[2]?'var(--green)':'var(--tx3)'}">${l[2]?'Achieved':'Not yet'}</div></div>`).join("")}
+      <p class="mini" style="margin-top:10px;padding-top:10px;border-top:1px solid var(--line2)">Your certificate is issued at Level 5, after your trainer confirms your final assessment. Two levels to go.</p>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ch"><h4>Areas to strengthen</h4></div>
+    <div style="padding:11px 14px">
+      <div style="display:flex;align-items:center;margin-bottom:9px"><div style="flex:1"><div style="font-size:12px;font-weight:600">Escalation pathway selection</div><div class="mini" style="font-size:11px">Failed 3 of 5 drills</div></div><span class="pill pr">Priority</span></div>
+      <div style="display:flex;align-items:center"><div style="flex:1"><div style="font-size:12px;font-weight:600">Boundary of agent authority</div><div class="mini" style="font-size:11px">Failed 2 of 6 drills</div></div><span class="pill pbr">Watch</span></div>
+    </div>
+  </div>
+</div></div>${tab(3)}`});
+
+/* 8 — programme */
+P.push({t:"16-week programme",c:"The full curriculum, locked to a weekly release. Nothing can be skipped ahead, and missed weeks stay open so nobody is shut out.",
+h:()=>`
+<div class="appbar"><div class="abrow"><div><div class="ttl">Programme</div><div class="sub">Four months · 16 sessions · cohort KAN-C1</div></div></div></div>
+<div class="body"><div class="pad">
+  ${[["Month One","Understanding the electoral environment",0,4],["Month Two","BVAS and ICT operations",4,8],
+     ["Month Three","Polling and collation",8,12],["Month Four","Practical training and assessment",12,16]].map(([m,d,a,b])=>`
+    <div class="sect">${m} — ${d}</div>
+    <div class="card" style="margin-bottom:4px">
+    ${WEEKS.slice(a,b).map((w,j)=>{const n=a+j+1;const done=n<11,now=n===11;
+      return `<div class="wkrow"><div class="wkno ${done?'done':now?'now':''}">${done?'✓':n}</div>
+      <div><div class="tt" style="color:${done||now?'var(--tx)':'var(--tx3)'}">${w}</div>
+      <div class="ss">${done?'Completed · '+(64+((n*7)%30))+'%':now?'Open now':'Opens Week '+n}</div></div>
+      <div class="rr">${done?'<span class="pill pg">Done</span>':now?'<span class="pill pbr">Current</span>':'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#C3C8C2" stroke-width="2.4"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg>'}</div></div>`}).join("")}
+    </div>`).join("")}
+</div></div>${tab(1)}`});
+
+/* 9 — certificate */
+P.push({t:"Certification",c:"The end of the programme. The certificate records the role, the polling unit, the final score and who confirmed it — and carries a reference that an administrator can verify.",
+h:()=>`
+<div class="appbar"><div class="abrow"><div><div class="ttl">Certificate</div><div class="sub">Issued 9 September 2026</div></div>
+<div class="rt"><div class="iconb"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v7a2 2 0 002 2h12a2 2 0 002-2v-7"/><path d="M16 6l-4-4-4 4"/><path d="M12 2v14"/></svg></div></div></div></div>
+<div class="body"><div class="pad">
+  <div class="cert">
+    <div class="sealw"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.5 13.5L17 22l-5-3-5 3 1.5-8.5"/></svg></div>
+    <h3>Certificate of Operational Readiness</h3>
+    <div style="font-size:11px;color:#B5D0C2">Level 5 — Readiness</div>
+    <div class="nm">Fatima Abubakar</div>
+    <div class="mt">Party / polling unit agent<br>PU 001 — Gwammaja Primary School<br>Gwammaja, Dala, Kano State</div>
+    <div class="ref">Reference PR-C3-4820-KA · Final score 91%<br>Confirmed by Ngozi Abaniwo, lead trainer</div>
+  </div>
+  <div class="card">
+    <div class="ch"><h4>What was assessed</h4></div>
+    <div style="padding:11px 14px">
+      <div class="scorerow"><span class="k">Knowledge test</span><div class="bar"><i style="width:89%"></i></div><span class="v">89%</span></div>
+      <div class="scorerow"><span class="k">Practical assessment</span><div class="bar"><i style="width:94%"></i></div><span class="v">94%</span></div>
+      <div class="scorerow"><span class="k">Scenario assessment</span><div class="bar"><i style="width:90%"></i></div><span class="v">90%</span></div>
+      <div class="scorerow"><span class="k">Mock election conduct</span><div class="bar"><i style="width:92%"></i></div><span class="v">92%</span></div>
+    </div>
+  </div>
+  <button class="btnS">Download as PDF</button>
+</div></div>${tab(4)}`});
+
+/* ===== TRAINER ===== */
+const T=[];
+T.push({t:"Cohort overview",c:"The trainer opens to their own cohorts — who is on track, who has stalled, and what needs their decision today.",
+h:()=>`
+<div class="appbar dk"><div class="abrow"><div><div class="ttl">Ngozi Abaniwo</div><div class="sub">Lead trainer · 3 cohorts · 187 participants</div></div>
+<div class="rt"><div class="iconb"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 01-3.4 0"/></svg></div></div></div></div>
+<div class="body"><div class="pad">
+  <div class="card pad2" style="display:flex;text-align:center">
+    <div style="flex:1"><div style="font-family:var(--serif);font-size:24px;line-height:1.1">187</div><div class="mini" style="font-size:10.5px">Participants</div></div>
+    <div style="flex:1;border-left:1px solid var(--line2);border-right:1px solid var(--line2)"><div style="font-family:var(--serif);font-size:24px;line-height:1.1;color:var(--brick)">9</div><div class="mini" style="font-size:10.5px">Need review</div></div>
+    <div style="flex:1"><div style="font-family:var(--serif);font-size:24px;line-height:1.1;color:var(--green)">71%</div><div class="mini" style="font-size:10.5px">At Level 4+</div></div>
+  </div>
+  <div class="card">
+    <div class="ch"><h4>Needs your decision</h4><span class="r">today</span></div>
+    <div class="wkrow"><div class="wkno" style="background:var(--brick-p);border-color:#EBD3CC;color:var(--brick)">9</div>
+      <div><div class="tt">Scenario responses to confirm</div><div class="ss">Scored by the system · oldest 6 hours</div></div>
+      <div class="rr"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8A928C" stroke-width="2.4"><path d="M9 18l6-6-6-6"/></svg></div></div>
+    <div class="wkrow"><div class="wkno" style="background:var(--brass-p);border-color:#E7DABB;color:var(--brass)">4</div>
+      <div><div class="tt">Participants flagged at risk</div><div class="ss">No activity for 9 days or more</div></div>
+      <div class="rr"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8A928C" stroke-width="2.4"><path d="M9 18l6-6-6-6"/></svg></div></div>
+    <div class="wkrow"><div class="wkno" style="background:var(--green-p);border-color:#CFE4D8;color:var(--green)">6</div>
+      <div><div class="tt">Ready for Level 5 confirmation</div><div class="ss">Final assessment complete</div></div>
+      <div class="rr"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8A928C" stroke-width="2.4"><path d="M9 18l6-6-6-6"/></svg></div></div>
+  </div>
+  <div class="card">
+    <div class="ch"><h4>My cohorts</h4></div>
+    ${[["KAN-C1","Dala & Fagge",84,"Week 11",78],["KAN-C2","Nassarawa & Tarauni",61,"Week 11",71],["KAN-C3","Gwale",42,"Week 9",59]].map(c=>`
+    <div class="trow"><div class="avx" style="background:var(--ink);border-radius:9px">${c[0].slice(-2)}</div>
+      <div><div class="n">${c[0]} · ${c[1]}</div><div class="m">${c[2]} participants · ${c[3]}</div></div>
+      <div class="r"><div style="font-size:13px;font-weight:700;color:${c[4]>=75?'var(--green)':c[4]>=65?'var(--brass)':'var(--brick)'}">${c[4]}%</div>
+      <div class="m">readiness</div></div></div>`).join("")}
+  </div>
+</div></div>${tab(0)}`});
+
+T.push({t:"Review a response",c:"The system proposes a score. The trainer confirms or changes it. No participant reaches Level 5 on the system's judgement alone — this is the control the training model insists on.",
+h:()=>`
+<div class="appbar"><div class="abrow"><div class="iconb"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 18l-6-6 6-6"/></svg></div>
+<div><div class="ttl">Review response</div><div class="sub">3 of 9 · Week 11 scenario drill</div></div></div></div>
+<div class="body"><div class="pad">
+  <div class="card pad2" style="display:flex;align-items:center">
+    <div class="avx" style="background:#2F5D82">MG</div>
+    <div><div style="font-size:13px;font-weight:700">Musa Garba</div><div class="mini" style="font-size:11px">Collation officer · PU 214, Fagge · Level 3</div></div>
+  </div>
+  <div class="card pad2">
+    <div class="mini" style="font-weight:700;color:var(--tx);margin-bottom:6px">Scenario</div>
+    <p class="mini">A ward result figure appears unusually high compared with the accredited voter count. What is the correct course of action?</p>
+  </div>
+  <div class="card pad2">
+    <div class="mini" style="font-weight:700;color:var(--tx);margin-bottom:6px">Their answer</div>
+    <p class="mini" style="font-style:italic">"I would check the figure against the form again, and if it is still wrong I would tell my supervisor to look at it and let them decide what to do next."</p>
+  </div>
+  <div class="scorebox">
+    <div style="display:flex;align-items:center;margin-bottom:9px">
+      <span style="font-size:12px;font-weight:700">System score</span>
+      <span style="margin-left:auto;font-family:var(--serif);font-size:22px">71%</span></div>
+    <div class="scorerow"><span class="k">Correct action</span><div class="bar"><i style="width:85%"></i></div><span class="v">Yes</span></div>
+    <div class="scorerow"><span class="k">Reasoning explained</span><div class="bar w"><i style="width:55%"></i></div><span class="v">Thin</span></div>
+    <div class="scorerow"><span class="k">Within role boundary</span><div class="bar"><i style="width:95%"></i></div><span class="v">Yes</span></div>
+    <div class="scorerow"><span class="k">Escalation route named</span><div class="bar d"><i style="width:40%"></i></div><span class="v">Vague</span></div>
+    <p class="mini" style="margin-top:9px;padding-top:9px;border-top:1px solid var(--line2)">Flagged: the escalation route is described as "my supervisor" rather than the collation officer in charge. Correct instinct, imprecise procedure.</p>
+  </div>
+  <div style="display:flex;margin-bottom:10px">
+    <button class="btnS" style="flex:1;margin-right:8px">Adjust score</button>
+    <button class="btnP" style="flex:1">Confirm 71%</button>
+  </div>
+  <button class="btnS">Send correction task to Musa</button>
+</div></div>`});
+
+T.push({t:"Schedule a session",c:"Scheduling creates a real Google Meet link through the Calendar API, drops it into every assigned participant's app, and records attendance against the competency file.",
+h:()=>`
+<div class="appbar"><div class="abrow"><div><div class="ttl">Schedule session</div><div class="sub">Creates a Google Meet link</div></div></div></div>
+<div class="body"><div class="pad">
+  <div class="fg"><span class="lab">Cohort</span><select class="sel"><option>KAN-C1 — Dala &amp; Fagge · 84 participants</option></select></div>
+  <div class="fg"><span class="lab">Session</span><select class="sel"><option>Week 11 — Ward and registration area collation</option></select></div>
+  <div style="display:flex;margin-bottom:13px">
+    <div style="flex:1;margin-right:9px"><span class="lab">Date</span><select class="sel"><option>Mon 15 Sep</option></select></div>
+    <div style="flex:1"><span class="lab">Time</span><select class="sel"><option>10:00 — 10:45</option></select></div>
+  </div>
+  <div class="card pad2" style="background:#F7FBF9;border-color:#CFE4D8;margin-bottom:13px">
+    <div style="display:flex;align-items:center;margin-bottom:7px">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#1B6B4A" stroke-width="2" style="margin-right:8px"><rect x="2" y="5" width="14" height="14" rx="2"/><path d="M22 8l-6 4 6 4z"/></svg>
+      <span style="font-size:12.5px;font-weight:700">Google Meet</span></div>
+    <p class="mini">A link is generated on save and added to your Google Calendar. Participants see it on their home screen and get a reminder 30 minutes before.</p>
+  </div>
+  <div class="card">
+    <div class="ch"><h4>Who will be notified</h4><span class="r">84 people</span></div>
+    ${[["Fatima Abubakar","Party agent","#1B6B4A"],["Kelechi Anyanwu","ICT / BVAS","#2F5D82"],["Musa Garba","Collation","#B8863B"],["Halima Bello","Party agent","#A8432C"]].map(p=>`
+    <div class="trow"><div class="avx" style="background:${p[2]}">${p[0].split(" ").map(x=>x[0]).join("")}</div>
+    <div><div class="n">${p[0]}</div><div class="m">${p[1]}</div></div>
+    <div class="r"><span class="pill pg">Will attend</span></div></div>`).join("")}
+    <div style="padding:10px 14px;text-align:center" class="mini">and 80 others</div>
+  </div>
+  <button class="btnP">Schedule and notify 84 participants</button>
+</div></div>`});
+
+T.push({t:"Mock election",c:"Week 14. The trainer assigns roles, then injects the failures the model calls for — and scores how each person actually responds under pressure.",
+h:()=>`
+<div class="appbar dk"><div class="abrow"><div><div class="ttl">Mock election</div><div class="sub">Week 14 · KAN-C1 · running 00:42:18</div></div>
+<div class="rt"><span class="pill pr">Live</span></div></div></div>
+<div class="body"><div class="pad">
+  <div class="card">
+    <div class="ch"><h4>Inject a situation</h4><span class="r">5 used</span></div>
+    <div style="padding:11px 14px">
+      ${[["Authentication failure mid-session","BVAS operators + agents"],["Agent dispute at the polling unit","Agents + security"],["Technical device fault","ICT personnel"],["Crowd pressure at entrance","Security personnel"],["Questioned figure at collation","Collation staff"]].map((s,i)=>`
+      <div style="display:flex;align-items:center;padding:8px 0;border-bottom:${i<4?'1px solid var(--line2)':'none'}">
+        <div style="flex:1"><div style="font-size:12.5px;font-weight:600">${s[0]}</div><div class="mini" style="font-size:11px">${s[1]}</div></div>
+        <button class="btnG" style="flex:0 0 auto">${i<2?'Sent':'Send'}</button></div>`).join("")}
+    </div>
+  </div>
+  <div class="card">
+    <div class="ch"><h4>Live scoring</h4><span class="r">tap to score</span></div>
+    ${[["Fatima Abubakar","Party agent","#1B6B4A",1],["Kelechi Anyanwu","BVAS operator","#2F5D82",1],["Blessing Uche","Security","#A8432C",0],["Musa Garba","Collation","#B8863B",0]].map(p=>`
+    <div class="trow"><div class="avx" style="background:${p[2]}">${p[0].split(" ").map(x=>x[0]).join("")}</div>
+    <div><div class="n">${p[0]}</div><div class="m">${p[1]}</div></div>
+    <div class="r">${p[3]?'<span class="pill pg">Scored</span>':'<span class="pill pn">Pending</span>'}</div></div>`).join("")}
+  </div>
+  <button class="btnP">End exercise and open debrief</button>
+</div></div>`});
+
+/* =============== RUNTIME =============== */
+let ROLE='p', IDX=0;
+const set=()=>ROLE==='p'?P:T;
+function setRole(r){ROLE=r;IDX=0;
+  document.getElementById('rbP').className=r==='p'?'on':'';
+  document.getElementById('rbT').className=r==='t'?'on':'';
+  document.getElementById('railH').textContent=r==='p'?'Training that proves readiness':'The trainer stays the assessor';
+  document.getElementById('railP').textContent=r==='p'
+    ?'Sixteen weeks, delivered one session at a time — with every answer scored, every mistake corrected, and every participant tracked to certification.'
+    :'The system scores first and the trainer decides. Nobody is certified on an automated judgement alone.';
+  draw();}
+function move(d){const s=set();IDX=Math.max(0,Math.min(s.length-1,IDX+d));draw()}
+function jump(i){IDX=i;draw()}
+function draw(){
+  const s=set();
+  document.getElementById('app').innerHTML=s[IDX].h();
+  document.getElementById('cap').textContent=s[IDX].c;
+  document.getElementById('steps').innerHTML=s.map((x,i)=>
+    `<button class="step ${i===IDX?'on':''} ${i<IDX?'done':''}" onclick="jump(${i})">
+      <span class="n">${i<IDX?'✓':i+1}</span>
+      <span><span class="t">${x.t}</span></span></button>`).join("");
+  document.getElementById('dots').innerHTML=s.map((_,i)=>`<i class="${i===IDX?'on':''}"></i>`).join("");
+  document.getElementById('prevB').disabled=IDX===0;
+  document.getElementById('nextB').disabled=IDX===s.length-1;
+  document.getElementById('nextB').textContent=IDX===s.length-1?'End of walkthrough':'Next screen';
+}
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight')move(1); if(e.key==='ArrowLeft')move(-1);
+});
+draw();
+</script>
+</body>
+</html>
